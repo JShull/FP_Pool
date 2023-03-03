@@ -1,0 +1,37 @@
+{
+    "name": "com.fuzzphyte.pool",
+    "version": "0.1.0",
+    "displayName": "FP Pool",
+    "description": "FP Pool is a simple object pooling system.",
+    "unity": "2022.2",
+    "unityRelease": "7f1",
+    "documentationUrl": "https://github.com/jshull/FP_Pool/README.md",
+    "changelogUrl": "https://github.com/jshull/FP_Pool/CHANGELOG.md",
+    "licensesUrl": "https://github.com/jshull/FP_Pool/LICENSE.md",
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/jshull/FP_Pool.git"
+    },
+    "dependencies": {
+      "com.unity.mathematics": "1.2.6"
+    },
+    "samples": [
+      
+      {
+        "displayName": "Bullet Fire Sample",
+        "description": "This is a simple example of firing an object using the interface and the object pooler. Does use the old input system for testing purposes.",
+        "path": "Samples~/URPSamples"
+      }
+    ],
+    "keywords": [
+      "object pool",
+      "3D",
+      "interface"
+    ],
+    "author": {
+      "name": "John Shull",
+      "email": "the.john.shull@gmail.com",
+      "url": "https://github.com/jshull"
+    },
+    "type": "tool"
+  }
