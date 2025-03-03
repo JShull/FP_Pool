@@ -33,7 +33,7 @@ namespace FuzzPhyte.Pool.Examples
             if (this.GetComponent<Rigidbody>())
             {
                 var rb = this.GetComponent<Rigidbody>();
-                rb.velocity = Vector3.zero;
+                rb.linearVelocity = Vector3.zero;
                 rb.angularVelocity = Vector3.zero;
             }
             this.transform.rotation = Quaternion.identity;

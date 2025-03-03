@@ -18,6 +18,10 @@ namespace FuzzPhyte.Pool.Examples
             if (Input.GetMouseButtonDown(0))
             {
                 var aBullet = MyBulletPooler.GetObject(BulletSpawnPt);
+                if(aBullet==null)
+                {
+                    return;
+                }
                 aBullet.transform.position = BulletSpawnPt.position;
                 //aBullet.transform.rotation = BulletSpawnPt.rotation;
                 if (aBullet.GetComponent<Rigidbody>())

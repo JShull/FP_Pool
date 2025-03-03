@@ -6,7 +6,7 @@ FP_Pool is designed and built to provide a rather generic solution for object po
 
 ## Setup & Design
 
-FP_Pool is designed around the idea that you have some set of base objects that you want to pool. These objects are being requested from the pool and then depending upon their conditions and what you're doing you should release them back to the pool when you're done. This object pool system defaults to keep account of items that are active and the original list - it will grow in size to meet your demands if all objects are active and there's none left in the pool **BUT** it will also clean up after itself and destroy those items once a certain amount of time has passed. Be aware of this built-in logic!
+FP_Pool is designed around the idea that you have some set of base objects that you want to pool. These objects are being requested from the pool and then depending upon their conditions and what you're doing you should release them back to the pool when you're done. This object pool system defaults to keep account of items that are active and the original list - it will grow in size to meet your demands if all objects are active and there's none left in the pool **BUT** it will also clean up after itself and destroy those items once a certain amount of time has passed. Be aware of this built-in logic! It also has an upper max limit on active objects - this system never increases the original pool size it only adds to a queue and eventually all of those items are destroyed/removed. This upper limit is set just to make sure you have a hold on the memory leak.
 
 ### Software Architecture
 
@@ -17,7 +17,7 @@ There is currently two parts to the FP_Pool tool.
   * Please see the simple URPExample included in the samples of this package to see how to do that.
 * 'IFPPoolable.cs' is an interface that we suggest you implement your own MonoBehaviour component class on the root transform of your prefab.
   * This interface isn't required but it is helpful for when the object pool system is activating, releasing, and on first activation you can be notified of said events.
-  * Please see the simple URPExample included in the samples of this package to see how we utilize the interface to deactivate the bullet prefab after a few seconds.
+  * Please see the simple URPExample included in the samples of this package to see how we utilize the interface to deactivate the bullet prefab after a few seconds as well as set a max active count.
 
 ## Dependencies
 

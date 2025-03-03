@@ -6,13 +6,14 @@ namespace FuzzPhyte.Pool
 {
     public class FP_ObjectPool<T> where T : Component
     {
-        private T prefab;
-        private Transform parent;
-        private Transform poolMgr;
-        private int poolSize;
-        private float idleTime;
-        private Queue<T> pool;
-        private HashSet<T> activeObjects;
+        protected T prefab;
+        protected Transform parent;
+        protected Transform poolMgr;
+        protected int poolSize;
+        protected int maxActiveObjectListSize;
+        protected float idleTime;
+        protected Queue<T> pool;
+        protected HashSet<T> activeObjects;
 
         /// <summary>
         /// we are going to spawn the items under the parent object passed in
@@ -23,8 +24,9 @@ namespace FuzzPhyte.Pool
         /// <param name="PoolManager"></param>
         /// <param name="idleTime"></param>
         /// <param name="parent"></param>
-        public FP_ObjectPool(T prefab, int poolSize, Transform PoolManager, float idleTime = 5f, Transform parent = null)
+        public FP_ObjectPool(T prefab, int poolSize, Transform PoolManager, float idleTime = 5f, Transform parent = null, int MaxActiveObjects=1000)
         {
+            this.maxActiveObjectListSize = MaxActiveObjects;
             this.prefab = prefab;
             this.poolSize = poolSize;
             this.idleTime = idleTime;
@@ -62,22 +64,11 @@ namespace FuzzPhyte.Pool
 
         public T GetObject()
         {
-            T obj;
-
-            if (pool.Count > 0)
+            T obj = CheckPoolActiveSize();
+            if(obj==null)
             {
-                obj = pool.Dequeue();
+                return null;
             }
-            else
-            {
-                obj = Object.Instantiate(prefab, parent);
-                SetupTransformObject(obj);
-                if (obj is IFPPoolable)
-                {
-                    obj.GetComponent<IFPPoolable>().OnObjectFirstGenerated(poolMgr);
-                }
-            }
-
             obj.gameObject.SetActive(true);
 
             activeObjects.Add(obj);
@@ -92,20 +83,10 @@ namespace FuzzPhyte.Pool
         }
         public T GetObject(Vector3 position, Quaternion rotation)
         {
-            T obj;
-
-            if (pool.Count > 0)
+            T obj = CheckPoolActiveSize();
+            if(obj==null)
             {
-                obj = pool.Dequeue();
-            }
-            else
-            {
-                obj = Object.Instantiate(prefab, parent);
-                SetupTransformObject(obj);
-                if (obj is IFPPoolable)
-                {
-                    obj.GetComponent<IFPPoolable>().OnObjectFirstGenerated(poolMgr);
-                }
+                return null;
             }
 
             obj.transform.position = position;
@@ -122,8 +103,32 @@ namespace FuzzPhyte.Pool
 
             return obj;
         }
+        protected T CheckPoolActiveSize(){
 
-        private void SetupTransformObject(T obj)
+            T obj;
+
+            if (pool.Count > 0)
+            {
+                obj = pool.Dequeue();
+            }
+            else
+            {
+                if(activeObjects.Count >= maxActiveObjectListSize)
+                {
+                    Debug.LogWarning($"Pool has hit maxPoolSize: {maxActiveObjectListSize}, returning null");
+                    return null;
+                }
+                obj = Object.Instantiate(prefab, parent);
+                SetupTransformObject(obj);
+                if (obj is IFPPoolable)
+                {
+                    obj.GetComponent<IFPPoolable>().OnObjectFirstGenerated(poolMgr);
+                }
+            }
+            return obj;
+        }
+
+        protected void SetupTransformObject(T obj)
         {
             obj.gameObject.transform.localPosition = Vector3.zero;
             obj.gameObject.transform.localRotation = Quaternion.identity;
