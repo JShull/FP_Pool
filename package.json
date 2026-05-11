@@ -1,13 +1,13 @@
 {
     "name": "com.fuzzphyte.pool",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "displayName": "FP Pool",
     "description": "FP Pool is a simple object pooling system.",
     "unity": "2022.2",
     "unityRelease": "7f1",
-    "documentationUrl": "https://github.com/jshull/FP_Pool/README.md",
-    "changelogUrl": "https://github.com/jshull/FP_Pool/CHANGELOG.md",
-    "licensesUrl": "https://github.com/jshull/FP_Pool/LICENSE.md",
+    "documentationUrl": "https://github.com/JShull/FP_Pool/blob/main/README.md",
+    "changelogUrl": "https://github.com/jshull/FP_Pool/blob/main/CHANGELOG.md",
+    "licensesUrl": "https://github.com/jshull/FP_Pool/blob/main/LICENSE.md",
     "repository": {
       "type": "git",
       "url": "https://github.com/jshull/FP_Pool.git"
