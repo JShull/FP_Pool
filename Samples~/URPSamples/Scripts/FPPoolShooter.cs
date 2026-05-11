@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace FuzzPhyte.Pool.Examples
@@ -25,16 +23,15 @@ namespace FuzzPhyte.Pool.Examples
                 //aBullet.transform.rotation = BulletSpawnPt.rotation;
                 if (aBullet.GetComponent<Rigidbody>())
                 {
-                    var rb = aBullet.GetComponent<Rigidbody>();
+                    var rb = aBullet.gameObject.GetComponent<Rigidbody>();
                     rb.AddForce(BulletSpawnPt.forward * BulletForce);
                 }
                 else
                 {
-                   var rb= aBullet.AddComponent<Rigidbody>();
-                    rb.AddForce(BulletSpawnPt.forward * BulletForce);
+                   var rb= aBullet.gameObject.AddComponent<Rigidbody>();
+                   rb.AddForce(BulletSpawnPt.forward * BulletForce);
                 }
             }
         }
     }
-
 }
