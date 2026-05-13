@@ -24,7 +24,7 @@ namespace FuzzPhyte.Pool
         /// <param name="PoolManager"></param>
         /// <param name="idleTime"></param>
         /// <param name="parent"></param>
-        public FP_ObjectPool(T prefab, int poolSize, Transform PoolManager, float idleTime = 5f, Transform parent = null, int MaxActiveObjects=1000)
+        public FP_ObjectPool(T prefab, int poolSize, Transform PoolManager, float idleTime = 5f, Transform parent = null, int MaxActiveObjects=1000,string baseName = "pooledItem")
         {
             this.maxActiveObjectListSize = MaxActiveObjects;
             this.prefab = prefab;
@@ -39,7 +39,7 @@ namespace FuzzPhyte.Pool
             for (int i = 0; i < poolSize; i++)
             {
                 T obj = Object.Instantiate(prefab, parent);
-
+                obj.name = $"{baseName}_{i}";
                 // if there's anything we need to do to the object when we first generate it
                 SetupTransformObject(obj);
                 if (obj is IFPPoolable)
