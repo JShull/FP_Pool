@@ -95,7 +95,7 @@ namespace FuzzPhyte.Pool
 
             return obj;
         }
-        public T GetObject(Vector3 position, Quaternion rotation)
+        public T GetObject(Vector3 position, Quaternion rotation, Action onReleaseAction = null)
         {
             T obj = CheckPoolActiveSize();
             if(obj==null)
