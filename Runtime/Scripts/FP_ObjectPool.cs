@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UIElements;
-
+using System;
 namespace FuzzPhyte.Pool
 {
     public class FP_ObjectPool<T> where T : Component
@@ -14,6 +13,8 @@ namespace FuzzPhyte.Pool
         protected float idleTime;
         protected Queue<T> pool;
         protected HashSet<T> activeObjects;
+        protected Dictionary<T,Action> onReleaseActiveObjectActions;
+        protected bool deactivateObjectOnRelease = true;
 
         /// <summary>
         /// we are going to spawn the items under the parent object passed in
@@ -24,21 +25,23 @@ namespace FuzzPhyte.Pool
         /// <param name="PoolManager"></param>
         /// <param name="idleTime"></param>
         /// <param name="parent"></param>
-        public FP_ObjectPool(T prefab, int poolSize, Transform PoolManager, float idleTime = 5f, Transform parent = null, int MaxActiveObjects=1000,string baseName = "pooledItem")
+        public FP_ObjectPool(T prefab, int poolSize, Transform PoolManager, float idleTime = 5f, bool deactivateGameobjectOnRelease=true, Transform passedParent = null, int MaxActiveObjects=1000,string baseName = "pooledItem")
         {
             this.maxActiveObjectListSize = MaxActiveObjects;
             this.prefab = prefab;
             this.poolSize = poolSize;
             this.idleTime = idleTime;
-            this.parent = parent;
+            this.parent = passedParent;
             this.poolMgr = PoolManager;
+            this.deactivateObjectOnRelease = deactivateGameobjectOnRelease;
 
             pool = new Queue<T>(poolSize);
             activeObjects = new HashSet<T>();
+            onReleaseActiveObjectActions = new Dictionary<T, Action>();
 
             for (int i = 0; i < poolSize; i++)
             {
-                T obj = Object.Instantiate(prefab, parent);
+                T obj = UnityEngine.Object.Instantiate(prefab, parent);
                 obj.name = $"{baseName}_{i}";
                 // if there's anything we need to do to the object when we first generate it
                 SetupTransformObject(obj);
@@ -62,7 +65,7 @@ namespace FuzzPhyte.Pool
             }
         }
 
-        public T GetObject()
+        public T GetObject(Action onReleaseAction=null)
         {
             T obj = CheckPoolActiveSize();
             if(obj==null)
@@ -70,7 +73,18 @@ namespace FuzzPhyte.Pool
                 return null;
             }
             obj.gameObject.SetActive(true);
-
+            if (onReleaseAction != null)
+            {
+                if (onReleaseActiveObjectActions.ContainsKey(obj))
+                {
+                    onReleaseActiveObjectActions[obj] = onReleaseAction;
+                }
+                else
+                {
+                    onReleaseActiveObjectActions.Add(obj, onReleaseAction);
+                }
+            }
+                
             activeObjects.Add(obj);
 
             // Call the interface method if we have it
@@ -118,7 +132,7 @@ namespace FuzzPhyte.Pool
                     Debug.LogWarning($"Pool has hit maxPoolSize: {maxActiveObjectListSize}, returning null");
                     return null;
                 }
-                obj = Object.Instantiate(prefab, parent);
+                obj = UnityEngine.Object.Instantiate(prefab, parent);
                 SetupTransformObject(obj);
                 if (obj is IFPPoolable)
                 {
@@ -134,9 +148,8 @@ namespace FuzzPhyte.Pool
             obj.gameObject.transform.localRotation = Quaternion.identity;
         }
         
-        public void ReleaseObject(T obj)
+        protected void ReleaseObject(T obj)
         {
-            obj.gameObject.SetActive(false);
             activeObjects.Remove(obj);
             
             //if we have our interface we can reference it here
@@ -144,6 +157,16 @@ namespace FuzzPhyte.Pool
             {
                 obj.GetComponent<IFPPoolable>().OnObjectReleased();
             }
+            if (onReleaseActiveObjectActions.ContainsKey(obj))
+            {
+                onReleaseActiveObjectActions[obj]?.Invoke();
+                onReleaseActiveObjectActions.Remove(obj);
+            }
+            if (deactivateObjectOnRelease)
+            {
+                obj.gameObject.SetActive(false);
+            }
+            
             pool.Enqueue(obj);
         }
         /// <summary>
@@ -170,7 +193,12 @@ namespace FuzzPhyte.Pool
                     for (int i = 0; i < count; i++)
                     {
                         T obj = pool.Dequeue();
-                        Object.Destroy(obj.gameObject);
+                        if (onReleaseActiveObjectActions.ContainsKey(obj))
+                        {
+                            onReleaseActiveObjectActions[obj]?.Invoke();
+                            onReleaseActiveObjectActions.Remove(obj);
+                        }
+                        UnityEngine.Object.Destroy(obj.gameObject);
                     }
                 }
             }
