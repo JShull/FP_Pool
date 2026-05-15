@@ -148,7 +148,7 @@ namespace FuzzPhyte.Pool
             obj.gameObject.transform.localRotation = Quaternion.identity;
         }
         
-        protected void ReleaseObject(T obj)
+        protected void InternalReleaseObject(T obj)
         {
             activeObjects.Remove(obj);
             
@@ -176,8 +176,12 @@ namespace FuzzPhyte.Pool
         /// <param name="position"></param>
         public void ReleaseObject(T obj, Vector3 position)
         {
-            ReleaseObject(obj);
+            InternalReleaseObject(obj);
             obj.gameObject.transform.position = position;
+        }
+        public void ReleaseObject(T obj)
+        {
+            InternalReleaseObject(obj);
         }
 
         private System.Collections.IEnumerator CleanupCoroutine()
@@ -195,7 +199,7 @@ namespace FuzzPhyte.Pool
                         T obj = pool.Dequeue();
                         if (onReleaseActiveObjectActions.ContainsKey(obj))
                         {
-                            onReleaseActiveObjectActions[obj]?.Invoke();
+                            //onReleaseActiveObjectActions[obj]?.Invoke();
                             onReleaseActiveObjectActions.Remove(obj);
                         }
                         UnityEngine.Object.Destroy(obj.gameObject);
